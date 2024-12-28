@@ -1,0 +1,33 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+# Grid Parameters
+x = np.linspace(-5, 5, 100)
+y = np.linspace(-5, 5, 100)
+X, Y = np.meshgrid(x, y)
+
+# Warp Field Tensor Components (Symbolic Approximation)
+def warp_field(X, Y, t):
+    r = np.sqrt(X**2 + Y**2)
+    contraction = np.exp(-r**2) * np.cos(2 * np.pi * t)
+    expansion = np.exp(-r**2) * np.sin(2 * np.pi * t)
+    return contraction, expansion
+
+# Initialize Plot
+fig, ax = plt.subplots(figsize=(6, 6))
+ax.set_xlim(-5, 5)
+ax.set_ylim(-5, 5)
+quiver = ax.quiver(X, Y, np.zeros_like(X), np.zeros_like(Y), scale=50)
+
+# Update Function
+def update(t):
+    contraction, expansion = warp_field(X, Y, t)
+    U = contraction * (X / np.sqrt(X**2 + Y**2))
+    V = expansion * (Y / np.sqrt(X**2 + Y**2))
+    quiver.set_UVC(U, V)
+    return quiver,
+
+# Animate
+ani = FuncAnimation(fig, update, frames=np.linspace(0, 1, 100), interval=50, blit=True)
+plt.show()
